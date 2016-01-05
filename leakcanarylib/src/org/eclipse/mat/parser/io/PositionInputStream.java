@@ -18,6 +18,7 @@ import java.io.EOFException;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.eclipse.mat.hprof.Messages;
 
 public class PositionInputStream extends FilterInputStream implements DataInput {

@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.hprof.Messages;
 import org.eclipse.mat.snapshot.extension.IClassSpecificNameResolver;

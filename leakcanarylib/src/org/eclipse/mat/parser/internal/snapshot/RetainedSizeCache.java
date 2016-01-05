@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.eclipse.mat.collect.HashMapIntLong;
 import org.eclipse.mat.hprof.Messages;
 import org.eclipse.mat.parser.model.XSnapshotInfo;

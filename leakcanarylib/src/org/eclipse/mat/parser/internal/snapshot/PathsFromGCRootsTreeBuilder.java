@@ -15,6 +15,7 @@ package org.eclipse.mat.parser.internal.snapshot;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.eclipse.mat.snapshot.PathsFromGCRootsTree;
 
 public class PathsFromGCRootsTreeBuilder {

@@ -15,8 +15,14 @@
  */
 package com.squareup.leakcanary;
 
+import java.lang.ref.PhantomReference;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+import java.util.EnumSet;
+
 import static android.os.Build.MANUFACTURER;
 import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.ECLAIR;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1;
 import static android.os.Build.VERSION_CODES.JELLY_BEAN;
@@ -28,10 +34,6 @@ import static com.squareup.leakcanary.internal.LeakCanaryInternals.LOLLIPOP_MR1;
 import static com.squareup.leakcanary.internal.LeakCanaryInternals.MOTOROLA;
 import static com.squareup.leakcanary.internal.LeakCanaryInternals.NVIDIA;
 import static com.squareup.leakcanary.internal.LeakCanaryInternals.SAMSUNG;
-
-import java.util.EnumSet;
-
-import com.squareup.leakcanary.watcher.ExcludedRefs;
 
 /**
  * This class is a work in progress. You can help by reporting leak traces that seem to be caused
@@ -92,7 +94,7 @@ public enum AndroidExcludedRefs {
     }
   },
 
-  TEXT_LINE__SCACHED(SDK_INT < LOLLIPOP_MR1) {
+  TEXT_LINE__SCACHED(SDK_INT <= LOLLIPOP_MR1) {
     @Override void add(ExcludedRefs.Builder excluded) {
       // TextLine.sCached is a pool of 3 TextLine instances. TextLine.recycle() has had at least two
       // bugs that created memory leaks by not correctly clearing the recycled TextLine instances.
@@ -135,7 +137,7 @@ public enum AndroidExcludedRefs {
     }
   },
 
-  INPUT_METHOD_MANAGER__SERVED_VIEW(SDK_INT >= KITKAT && SDK_INT <= LOLLIPOP_MR1) {
+  INPUT_METHOD_MANAGER__SERVED_VIEW(SDK_INT >= JELLY_BEAN && SDK_INT <= LOLLIPOP_MR1) {
     @Override void add(ExcludedRefs.Builder excluded) {
       // When we detach a view that receives keyboard input, the InputMethodManager leaks a
       // reference to it until a new view asks for keyboard input.
@@ -167,12 +169,72 @@ public enum AndroidExcludedRefs {
     }
   },
 
-  SPELL_CHECKER_SESSION(SDK_INT >= JELLY_BEAN || SDK_INT <= LOLLIPOP_MR1) {
+  SPELL_CHECKER_SESSION(SDK_INT >= JELLY_BEAN && SDK_INT <= LOLLIPOP_MR1) {
     @Override void add(ExcludedRefs.Builder excluded) {
       // SpellCheckerSessionListenerImpl.mHandler is leaking destroyed Activity when the
       // SpellCheckerSession is closed before the service is connected.
       // Tracked here: https://code.google.com/p/android/issues/detail?id=172542
       excluded.instanceField("android.view.textservice.SpellCheckerSession$1", "this$0");
+    }
+  },
+
+  ACTIVITY_CHOOSE_MODEL(SDK_INT > ICE_CREAM_SANDWICH && SDK_INT <= LOLLIPOP_MR1) {
+    @Override void add(ExcludedRefs.Builder excluded) {
+      // ActivityChooserModel holds a static reference to the last set ActivityChooserModelPolicy
+      // which can be an activity context.
+      // Tracked here : https://code.google.com/p/android/issues/detail?id=172659
+      // Hack : https://gist.github.com/andaag/b05ab66ed0f06167d6e0
+      excluded.instanceField("android.support.v7.internal.widget.ActivityChooserModel",
+                             "mActivityChoserModelPolicy");
+      excluded.instanceField("android.widget.ActivityChooserModel", "mActivityChoserModelPolicy");
+    }
+  },
+
+  SPEECH_RECOGNIZER(SDK_INT < LOLLIPOP) {
+    @Override void add(ExcludedRefs.Builder excluded) {
+      // Prior to Android 5, SpeechRecognizer.InternalListener was a non static inner class and
+      // leaked the SpeechRecognizer which leaked an activity context.
+      // Fixed in AOSP: https://github.com/android/platform_frameworks_base/commit
+      // /b37866db469e81aca534ff6186bdafd44352329b
+      excluded.instanceField("android.speech.SpeechRecognizer$InternalListener", "this$0");
+    }
+  },
+
+  ACCOUNT_MANAGER(SDK_INT > ECLAIR && SDK_INT <= LOLLIPOP_MR1) {
+    @Override void add(ExcludedRefs.Builder excluded) {
+      // AccountManager$AmsTask$Response is a stub and is held in memory by native code, probably
+      // because the reference to the response in the other process hasn't been cleared.
+      // AccountManager$AmsTask is holding on to the activity reference to use for launching a new
+      // sub- Activity.
+      // Tracked here: https://code.google.com/p/android/issues/detail?id=173689
+      // Fix: Pass a null activity reference to the AccountManager methods and then deal with the
+      // returned future to to get the result and correctly start an activity when it's available.
+      excluded.instanceField("android.accounts.AccountManager$AmsTask$Response", "this$1");
+    }
+  },
+
+  MEDIA_SCANNER_CONNECTION(SDK_INT <= LOLLIPOP_MR1) {
+    @Override void add(ExcludedRefs.Builder excluded) {
+      // The static method MediaScannerConnection.scanFile() takes an activity context but the
+      // service might not disconnect after the activity has been destroyed.
+      // Tracked here: https://code.google.com/p/android/issues/detail?id=173788
+      // Fix: Create an instance of MediaScannerConnection yourself and pass in the application
+      // context. Call connect() and disconnect() manually.
+      excluded.instanceField("android.media.MediaScannerConnection", "mContext");
+    }
+  },
+
+  USER_MANAGER__SINSTANCE(SDK_INT >= JELLY_BEAN && SDK_INT <= LOLLIPOP_MR1) {
+    @Override void add(ExcludedRefs.Builder excluded) {
+      // UserManager has a static sInstance field that creates an instance and caches it the first
+      // time UserManager.get() is called. This instance is created with the outer context (which
+      // is an activity base context).
+      // Tracked here: https://code.google.com/p/android/issues/detail?id=173789
+      // Introduced by: https://github.com/android/platform_frameworks_base/commit
+      // /27db46850b708070452c0ce49daf5f79503fbde6
+      // Fix: trigger a call to UserManager.get() in Application.onCreate(), so that the
+      // UserManager instance gets cached with a reference to the application context.
+      excluded.instanceField("android.os.UserManager", "mContext");
     }
   },
 
@@ -200,7 +262,10 @@ public enum AndroidExcludedRefs {
       SAMSUNG.equals(MANUFACTURER) && SDK_INT >= KITKAT && SDK_INT <= LOLLIPOP) {
     @Override void add(ExcludedRefs.Builder excluded) {
       // ClipboardUIManager is a static singleton that leaks an activity context.
-      excluded.staticField("android.sec.clipboard.ClipboardUIManager", "sInstance");
+      // Fix: trigger a call to ClipboardUIManager.getInstance() in Application.onCreate(), so
+      // that the ClipboardUIManager instance gets cached with a reference to the
+      // application context. Example: https://gist.github.com/pepyakin/8d2221501fd572d4a61c
+      excluded.instanceField("android.sec.clipboard.ClipboardUIManager", "mContext");
     }
   },
 
@@ -275,11 +340,21 @@ public enum AndroidExcludedRefs {
     }
   },
 
+  SOFT_REFERENCES {
+    @Override void add(ExcludedRefs.Builder excluded) {
+      excluded.clazz(WeakReference.class.getName(), true);
+      excluded.clazz(SoftReference.class.getName(), true);
+      excluded.clazz(PhantomReference.class.getName(), true);
+      excluded.clazz("java.lang.ref.Finalizer", true);
+      excluded.clazz("java.lang.ref.FinalizerReference", true);
+    }
+  },
+
   FINALIZER_WATCHDOG_DAEMON {
     @Override void add(ExcludedRefs.Builder excluded) {
       // If the FinalizerWatchdogDaemon thread is on the shortest path, then there was no other
       // reference to the object and it was about to be GCed.
-      excluded.thread("FinalizerWatchdogDaemon");
+      excluded.thread("FinalizerWatchdogDaemon", true);
     }
   },
 
@@ -288,23 +363,33 @@ public enum AndroidExcludedRefs {
       // The main thread stack is ever changing so local variables aren't likely to hold references
       // for long. If this is on the shortest path, it's probably that there's a longer path with
       // a real leak.
-      excluded.thread("main");
+      excluded.thread("main", true);
     }
   },
 
   LEAK_CANARY_THREAD {
     @Override void add(ExcludedRefs.Builder excluded) {
-      excluded.thread(LEAK_CANARY_THREAD_NAME);
+      excluded.thread(LEAK_CANARY_THREAD_NAME, true);
     }
   },
-  //
-  ;
+
+  EVENT_RECEIVER__MMESSAGE_QUEUE {
+    @Override void add(ExcludedRefs.Builder excluded) {
+      //  DisplayEventReceiver keeps a reference message queue object so that it is not GC'd while
+      // the native peer of the receiver is using them.
+      // The main thread message queue is held on by the main Looper, but that might be a longer
+      // path. Let's not confuse people with a shorter path that is less meaningful.
+      excluded.instanceField("android.view.Choreographer$FrameDisplayEventReceiver",
+          "mMessageQueue", true);
+    }
+  };
 
   /**
    * This returns the references in the leak path that should be ignored by all on Android.
    */
   public static ExcludedRefs.Builder createAndroidDefaults() {
-    return createBuilder(EnumSet.of(FINALIZER_WATCHDOG_DAEMON, MAIN, LEAK_CANARY_THREAD));
+    return createBuilder(EnumSet.of(SOFT_REFERENCES, FINALIZER_WATCHDOG_DAEMON, MAIN, LEAK_CANARY_THREAD,
+        EVENT_RECEIVER__MMESSAGE_QUEUE));
   }
 
   /**

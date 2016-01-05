@@ -15,6 +15,7 @@ package org.eclipse.mat.parser.internal;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.collect.ArrayUtils;
 import org.eclipse.mat.collect.BitField;

@@ -15,6 +15,7 @@ package org.eclipse.mat.snapshot;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.collect.HashMapIntObject;
 

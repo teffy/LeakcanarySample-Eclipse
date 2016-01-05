@@ -14,6 +14,7 @@ package org.eclipse.mat.parser.index;
 
 import java.io.IOException;
 import java.io.Serializable;
+
 import org.eclipse.mat.SnapshotException;
 
 public interface IIndexReader {

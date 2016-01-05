@@ -15,23 +15,17 @@
  */
 package com.squareup.leakcanary;
 
-import static com.squareup.leakcanary.internal.LeakCanaryInternals.isInServiceProcess;
-import static com.squareup.leakcanary.internal.LeakCanaryInternals.setEnabled;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
-
-import com.squareup.leakcanary.analyzer.AnalysisResult;
 import com.squareup.leakcanary.internal.DisplayLeakActivity;
 import com.squareup.leakcanary.internal.HeapAnalyzerService;
-import com.squareup.leakcanary.watcher.DebuggerControl;
-import com.squareup.leakcanary.watcher.ExcludedRefs;
-import com.squareup.leakcanary.watcher.GcTrigger;
-import com.squareup.leakcanary.watcher.HeapDump;
-import com.squareup.leakcanary.watcher.RefWatcher;
+
+import static com.squareup.leakcanary.internal.LeakCanaryInternals.isInServiceProcess;
+import static com.squareup.leakcanary.internal.LeakCanaryInternals.setEnabled;
 
 public final class LeakCanary {
 
@@ -57,7 +51,7 @@ public final class LeakCanary {
     enableDisplayLeakActivity(application);
     HeapDump.Listener heapDumpListener =
         new ServiceHeapDumpListener(application, listenerServiceClass);
-    RefWatcher refWatcher = androidWatcher(heapDumpListener, excludedRefs);
+    RefWatcher refWatcher = androidWatcher(application, heapDumpListener, excludedRefs);
     ActivityRefWatcher.installOnIcsPlus(application, refWatcher);
     return refWatcher;
   }
@@ -65,10 +59,10 @@ public final class LeakCanary {
   /**
    * Creates a {@link RefWatcher} with a default configuration suitable for Android.
    */
-  public static RefWatcher androidWatcher(HeapDump.Listener heapDumpListener,
+  public static RefWatcher androidWatcher(Context context, HeapDump.Listener heapDumpListener,
       ExcludedRefs excludedRefs) {
     DebuggerControl debuggerControl = new AndroidDebuggerControl();
-    AndroidHeapDumper heapDumper = new AndroidHeapDumper();
+    AndroidHeapDumper heapDumper = new AndroidHeapDumper(context);
     heapDumper.cleanup();
     return new RefWatcher(new AndroidWatchExecutor(), debuggerControl, GcTrigger.DEFAULT,
         heapDumper, heapDumpListener, excludedRefs);
@@ -79,7 +73,8 @@ public final class LeakCanary {
   }
 
   /** Returns a string representation of the result of a heap analysis. */
-  public static String leakInfo(Context context, HeapDump heapDump, AnalysisResult result) {
+  public static String leakInfo(Context context, HeapDump heapDump, AnalysisResult result,
+      boolean detailed) {
     PackageManager packageManager = context.getPackageManager();
     String packageName = context.getPackageName();
     PackageInfo packageInfo;
@@ -91,6 +86,7 @@ public final class LeakCanary {
     String versionName = packageInfo.versionName;
     int versionCode = packageInfo.versionCode;
     String info = "In " + packageName + ":" + versionName + ":" + versionCode + ".\n";
+    String detailedString = "";
     if (result.leakFound) {
       if (result.excludedLeak) {
         info += "* LEAK CAN BE IGNORED.\n";
@@ -100,11 +96,18 @@ public final class LeakCanary {
         info += " (" + heapDump.referenceName + ")";
       }
       info += " has leaked:\n" + result.leakTrace.toString() + "\n";
+      if (detailed) {
+        detailedString = "\n* Details:\n" + result.leakTrace.toDetailedString();
+      }
     } else if (result.failure != null) {
       info += "* FAILURE:\n" + Log.getStackTraceString(result.failure) + "\n";
     } else {
       info += "* NO LEAK FOUND.\n\n";
     }
+    if (detailed) {
+      detailedString += "* Excluded Refs:\n" + heapDump.excludedRefs;
+    }
+
     info += "* Reference Key: "
         + heapDump.referenceKey
         + "\n"
@@ -123,6 +126,8 @@ public final class LeakCanary {
         + Build.VERSION.SDK_INT
         + " LeakCanary: "
 //        + BuildConfig.LIBRARY_VERSION
+        + " "
+//        + BuildConfig.GIT_SHA
         + "\n"
         + "* Durations: watch="
         + heapDump.watchDurationMs
@@ -133,7 +138,8 @@ public final class LeakCanary {
         + "ms, analysis="
         + result.analysisDurationMs
         + "ms"
-        + "\n";
+        + "\n"
+        + detailedString;
 
     return info;
   }

@@ -15,6 +15,7 @@ package org.eclipse.mat.parser.internal.snapshot;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.eclipse.mat.collect.HashMapIntObject;
 
 abstract public class ObjectCache<E> {

@@ -14,6 +14,7 @@ package org.eclipse.mat.hprof;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.eclipse.mat.parser.io.PositionInputStream;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.model.IObject;

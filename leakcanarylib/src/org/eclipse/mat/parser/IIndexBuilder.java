@@ -14,6 +14,7 @@ package org.eclipse.mat.parser;
 
 import java.io.File;
 import java.io.IOException;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.util.IProgressListener;
 

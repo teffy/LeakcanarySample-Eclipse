@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.collect.ArrayLong;
 import org.eclipse.mat.snapshot.model.Field;

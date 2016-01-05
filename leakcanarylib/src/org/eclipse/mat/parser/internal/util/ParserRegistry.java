@@ -15,6 +15,7 @@ package org.eclipse.mat.parser.internal.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
 import org.eclipse.mat.parser.IIndexBuilder;
 import org.eclipse.mat.parser.IObjectReader;
 import org.eclipse.mat.snapshot.SnapshotFormat;

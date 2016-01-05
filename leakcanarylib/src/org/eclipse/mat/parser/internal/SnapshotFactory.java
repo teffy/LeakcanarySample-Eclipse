@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.hprof.Messages;
 import org.eclipse.mat.parser.IIndexBuilder;

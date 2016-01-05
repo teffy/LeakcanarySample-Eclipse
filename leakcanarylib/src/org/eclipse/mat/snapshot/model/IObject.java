@@ -14,6 +14,7 @@ package org.eclipse.mat.snapshot.model;
 
 import java.io.Serializable;
 import java.util.List;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
 

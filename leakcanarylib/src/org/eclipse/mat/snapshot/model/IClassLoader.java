@@ -13,6 +13,7 @@
 package org.eclipse.mat.snapshot.model;
 
 import java.util.List;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.util.IProgressListener;
 

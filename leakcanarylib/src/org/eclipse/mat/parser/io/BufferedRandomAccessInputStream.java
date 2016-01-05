@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.lang.ref.SoftReference;
+
 import org.eclipse.mat.collect.HashMapLongObject;
 
 public class BufferedRandomAccessInputStream extends InputStream {

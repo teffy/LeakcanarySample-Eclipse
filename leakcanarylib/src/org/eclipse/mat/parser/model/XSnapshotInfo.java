@@ -13,6 +13,7 @@
 package org.eclipse.mat.parser.model;
 
 import java.util.Date;
+
 import org.eclipse.mat.snapshot.SnapshotInfo;
 
 public final class XSnapshotInfo extends SnapshotInfo {

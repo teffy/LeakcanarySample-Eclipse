@@ -14,6 +14,7 @@ package org.eclipse.mat.parser.internal.snapshot;
 
 import java.util.List;
 import java.util.Set;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.collect.BitField;
 import org.eclipse.mat.hprof.Messages;

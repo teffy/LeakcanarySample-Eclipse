@@ -14,6 +14,7 @@ package org.eclipse.mat.parser.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.collect.ArrayInt;
 import org.eclipse.mat.parser.internal.SnapshotImpl;

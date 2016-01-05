@@ -16,6 +16,7 @@ import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.OutputStream;
+
 import org.eclipse.mat.hprof.Messages;
 
 public class BitOutputStream implements Flushable, Closeable {

@@ -14,6 +14,7 @@ package org.eclipse.mat.hprof;
 
 import java.io.IOException;
 import java.util.List;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.collect.ArrayLong;
 import org.eclipse.mat.collect.HashMapLongObject;

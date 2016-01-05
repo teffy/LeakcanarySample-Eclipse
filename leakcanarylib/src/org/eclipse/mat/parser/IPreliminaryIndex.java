@@ -13,6 +13,7 @@
 package org.eclipse.mat.parser;
 
 import java.util.List;
+
 import org.eclipse.mat.collect.HashMapIntObject;
 import org.eclipse.mat.parser.index.IIndexReader;
 import org.eclipse.mat.parser.model.ClassImpl;

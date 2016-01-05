@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.lang.ref.SoftReference;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+
 import org.eclipse.mat.collect.ArrayInt;
 import org.eclipse.mat.collect.ArrayIntCompressed;
 import org.eclipse.mat.collect.ArrayLong;

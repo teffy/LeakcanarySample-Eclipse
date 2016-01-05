@@ -15,6 +15,7 @@ package org.eclipse.mat.parser.internal;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.collect.BitField;
 import org.eclipse.mat.collect.HashMapIntObject;

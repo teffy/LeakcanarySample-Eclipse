@@ -13,6 +13,7 @@
 package org.eclipse.mat.inspections;
 
 import java.lang.reflect.Modifier;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.snapshot.ISnapshot;
 import org.eclipse.mat.snapshot.extension.IClassSpecificNameResolver;

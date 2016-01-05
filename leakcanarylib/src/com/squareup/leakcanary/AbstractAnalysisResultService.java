@@ -19,9 +19,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
-import com.squareup.leakcanary.analyzer.AnalysisResult;
-import com.squareup.leakcanary.watcher.HeapDump;
-
 public abstract class AbstractAnalysisResultService extends IntentService {
 
   private static final String HEAP_DUMP_EXTRA = "heap_dump_extra";

@@ -13,6 +13,7 @@
 package org.eclipse.mat.parser;
 
 import java.io.IOException;
+
 import org.eclipse.mat.SnapshotException;
 import org.eclipse.mat.parser.model.ObjectArrayImpl;
 import org.eclipse.mat.parser.model.PrimitiveArrayImpl;

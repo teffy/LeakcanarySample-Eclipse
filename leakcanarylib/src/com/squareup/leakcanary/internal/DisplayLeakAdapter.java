@@ -15,10 +15,6 @@
  */
 package com.squareup.leakcanary.internal;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import android.content.Context;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -26,10 +22,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
+import com.squareup.leakcanary.LeakTrace;
+import com.squareup.leakcanary.LeakTraceElement;
 import com.squareup.leakcanary.R;
-import com.squareup.leakcanary.analyzer.LeakTrace;
-import com.squareup.leakcanary.analyzer.LeakTraceElement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static com.squareup.leakcanary.LeakTraceElement.Holder.ARRAY;
+import static com.squareup.leakcanary.LeakTraceElement.Holder.THREAD;
+import static com.squareup.leakcanary.LeakTraceElement.Type.STATIC_FIELD;
 
 final class DisplayLeakAdapter extends BaseAdapter {
 
@@ -47,14 +49,14 @@ final class DisplayLeakAdapter extends BaseAdapter {
     if (getItemViewType(position) == TOP_ROW) {
       if (convertView == null) {
         convertView =
-            LayoutInflater.from(context).inflate(R.layout.__leak_canary_ref_top_row, parent, false);
+            LayoutInflater.from(context).inflate(R.layout.leak_canary_ref_top_row, parent, false);
       }
       TextView textView = findById(convertView, R.id.__leak_canary_row_text);
       textView.setText(context.getPackageName());
     } else {
       if (convertView == null) {
         convertView =
-            LayoutInflater.from(context).inflate(R.layout.__leak_canary_ref_row, parent, false);
+            LayoutInflater.from(context).inflate(R.layout.leak_canary_ref_row, parent, false);
       }
       TextView textView = findById(convertView, R.id.__leak_canary_row_text);
 
@@ -93,11 +95,11 @@ final class DisplayLeakAdapter extends BaseAdapter {
       htmlString += "references ";
     }
 
-    if (element.type == LeakTraceElement.Type.STATIC_FIELD) {
+    if (element.type == STATIC_FIELD) {
       htmlString += "<font color='#c48a47'>static</font> ";
     }
 
-    if (element.holder == LeakTraceElement.Holder.ARRAY || element.holder == LeakTraceElement.Holder.THREAD) {
+    if (element.holder == ARRAY || element.holder == THREAD) {
       htmlString += "<font color='#f3cf83'>" + element.holder.name().toLowerCase() + "</font> ";
     }
 

@@ -13,6 +13,7 @@
 package org.eclipse.mat.snapshot;
 
 import java.util.Collection;
+
 import org.eclipse.mat.SnapshotException;
 
 /**

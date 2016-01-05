@@ -15,15 +15,14 @@
  */
 package com.squareup.leakcanary;
 
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
 
-import com.squareup.leakcanary.watcher.Preconditions;
-import com.squareup.leakcanary.watcher.RefWatcher;
+import static android.os.Build.VERSION.SDK_INT;
+import static android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH;
+import static com.squareup.leakcanary.Preconditions.checkNotNull;
 
 @TargetApi(ICE_CREAM_SANDWICH) public final class ActivityRefWatcher {
 
@@ -69,8 +68,8 @@ import com.squareup.leakcanary.watcher.RefWatcher;
    * after they have been destroyed.
    */
   public ActivityRefWatcher(Application application, final RefWatcher refWatcher) {
-    this.application = Preconditions.checkNotNull(application, "application");
-    this.refWatcher = Preconditions.checkNotNull(refWatcher, "refWatcher");
+    this.application = checkNotNull(application, "application");
+    this.refWatcher = checkNotNull(refWatcher, "refWatcher");
   }
 
   void onActivityDestroyed(Activity activity) {

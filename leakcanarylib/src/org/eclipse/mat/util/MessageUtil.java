@@ -1,6 +1,7 @@
 package org.eclipse.mat.util;
 
 import java.text.MessageFormat;
+
 import org.eclipse.mat.hprof.Messages;
 
 public final class MessageUtil {

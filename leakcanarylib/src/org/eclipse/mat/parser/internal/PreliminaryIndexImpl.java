@@ -13,6 +13,7 @@
 package org.eclipse.mat.parser.internal;
 
 import java.util.List;
+
 import org.eclipse.mat.collect.HashMapIntObject;
 import org.eclipse.mat.parser.IPreliminaryIndex;
 import org.eclipse.mat.parser.index.IIndexReader;
