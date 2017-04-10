@@ -1,5 +1,4 @@
-# LeakcanarySample-Eclipse
-#Leakcanary的Eclipse版本
+# LeakcanarySample-Eclipse Dparted
 
 本项目是根据[Leakcanary](https://github.com/teffy/leakcanary)项目(version 1.3.1)改造而来的，本人项目中用到Leakcanary，如果只是作为普通app来开发，只需要根据leakcanary项目说明中的一样，添加
 ```
